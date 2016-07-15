@@ -1,6 +1,6 @@
 # Ambassador
 
-Analyze data in CRS database and print reports.
+Officially delegated component to report info from/to CGC TI API
 
 ## Install
 
