@@ -33,11 +33,6 @@ class StatusRetriever(object):
 
     def run(self):
         """A run() method. Happy now pylint?"""
-        status = {}
-        try:
-            status = self._cgc.getStatus()
-        except TiError as e:
-            LOG.error("Status error: %s", e.message)
-
+        status = self._cgc.getStatus()
         self._round, _ = Round.get_or_create(num=status['round'])
         Score.update_or_create(self._round, scores=status['scores'])
