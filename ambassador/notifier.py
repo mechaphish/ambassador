@@ -36,17 +36,23 @@ def send_email(subject, body):
 class Notifier(object):
     """Notifier class"""
 
-    def __init__(self):
+    def __init__(self, tries_threshold=0):
+        """Init"""
         self._live = False
+        self._tries_threshold = tries_threshold # wait # of tries before notify API down
+        self._api_down_tries = 0
 
     def api_is_up(self):
         """Notify API up"""
         if self._live is False:
             send_email("CGC API status", "TI went UP at {}")
         self._live = True
+        self._api_down_tries = 0
 
     def api_is_down(self):
         """Notify API down"""
-        if self._live is True:
-            send_email("CGC API status", "TI went DOWN at {}")
-        self._live = False
+        self._api_down_tries += 1
+        if self._api_down_tries == self._tries_threshold:
+            if self._live is True:
+                send_email("CGC API status", "TI went DOWN at {}")
+            self._live = False

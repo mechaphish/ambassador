@@ -22,25 +22,12 @@ LOG = ambassador.log.LOG.getChild('main')
 class CLI(object):
     """A docstring"""
     POLL_INTERVAL = int(os.environ.get('POLL_INTERVAL', 5))
-    NOTIFY_AFTER_NUMBER_OF_TRIES = 3
 
     def __init__(self):
         """Another docstring"""
         # Initialize APIs
         self.cgc = ambassador.cgc.ticlient.TiClient.from_env()
-        self.notifier = Notifier()
-        self.api_down_tries = 0
-
-    def api_is_down(self):
-        """Another docstring again"""
-        self.api_down_tries += 1
-        if self.api_down_tries == self.NOTIFY_AFTER_NUMBER_OF_TRIES:
-            self.notifier.api_is_down()
-
-    def api_is_up(self):
-        """And another"""
-        self.api_down_tries = 0
-        self.notifier.api_is_up()
+        self.notifier = Notifier(tries_threshold=3)
 
     def run(self):
         """And another"""
@@ -48,10 +35,10 @@ class CLI(object):
             try:
                 # wait for API to be available
                 while not self.cgc.ready():
-                    self.api_down()
+                    self.notifier.api_is_down()
                     time.sleep(self.POLL_INTERVAL)
 
-                self.api_up()
+                self.notifier.api_is_up()
 
                 status_retriever = StatusRetriever(self.cgc)
                 status_retriever.run()
@@ -62,7 +49,7 @@ class CLI(object):
                 # ConsensusEvaluationRetriever(self.cgc, _round).run()
 
             except ambassador.cgc.tierror.TiError:
-                self.api_down()
+                self.notifier.api_is_down()
 
         return 0
 
