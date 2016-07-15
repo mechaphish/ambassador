@@ -15,8 +15,9 @@ import ambassador.cgc.ticlient
 import ambassador.cgc.tierror
 import ambassador.log
 from ambassador.notifier import Notifier
-from ambassador.retrievers.status import StatusRetriever
+from ambassador.retrievers.consensus_evaluation import ConsensusEvaluationRetriever
 from ambassador.retrievers.feedback import FeedbackRetriever
+from ambassador.retrievers.status import StatusRetriever
 
 LOG = ambassador.log.LOG.getChild('main')
 
@@ -46,8 +47,8 @@ class CLI(object):
 
                 LOG.info("Round #%d", status_retriever.current_round.num)
 
+                ConsensusEvaluationRetriever(self.cgc, status_retriever.current_round).run()
                 FeedbackRetriever(self.cgc, status_retriever.current_round).run()
-                # ConsensusEvaluationRetriever(self.cgc, _round).run()
 
             except ambassador.cgc.tierror.TiError:
                 self.notifier.api_is_down()
