@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='ambassador',
     version='0.0.1',
-    description=u"Officially delegated to report info from/to CGC TI API",
+    description=u"Officially delegated component to report info from/to CGC TI API",
     classifiers=[],
     keywords='',
     author=u"Francesco Disperati",

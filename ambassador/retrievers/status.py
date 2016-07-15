@@ -14,12 +14,12 @@ from farnsworth.models import (
 
 from ambassador.cgc.tierror import TiError
 import ambassador.log
-LOG = ambassador.log.LOG.getChild('status')
+LOG = ambassador.log.LOG.getChild('status_retriever')
 
 
 class StatusRetriever(object):
     """
-    StatusRetriever module
+    StatusRetriever class
     """
 
     def __init__(self, cgc):
@@ -31,8 +31,15 @@ class StatusRetriever(object):
     def current_round(self):
         return self._round
 
+    def _save_round(self, status):
+        self._round, _ = Round.get_or_create(num=status['round'])
+
+    def _save_scores(self, status):
+        Score.update_or_create(self._round, scores=status['scores'])
+
     def run(self):
         """A run() method. Happy now pylint?"""
+        LOG.info("Getting status")
         status = self._cgc.getStatus()
-        self._round, _ = Round.get_or_create(num=status['round'])
-        Score.update_or_create(self._round, scores=status['scores'])
+        self._save_round(status)
+        self._save_scores(status)
