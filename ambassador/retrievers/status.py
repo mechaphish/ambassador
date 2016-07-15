@@ -12,7 +12,6 @@ from farnsworth.models import (
     Score,
 )
 
-from ambassador.cgc.tierror import TiError
 import ambassador.log
 LOG = ambassador.log.LOG.getChild('status_retriever')
 
@@ -29,12 +28,15 @@ class StatusRetriever(object):
 
     @property
     def current_round(self):
+        """Return corrent round"""
         return self._round
 
     def _save_round(self, status):
+        """Save current round"""
         self._round, _ = Round.get_or_create(num=status['round'])
 
     def _save_scores(self, status):
+        """Save scores"""
         Score.update_or_create(self._round, scores=status['scores'])
 
     def run(self):

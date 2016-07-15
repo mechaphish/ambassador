@@ -7,17 +7,8 @@ FeedbackRetriever module
 
 from __future__ import absolute_import
 
-import os
-import datetime
-
 from farnsworth.models import (
-    ChallengeBinaryNode,
-    ChallengeSet,
-    ChallengeSetFielding,
-    Evaluation,
     Feedback,
-    Score,
-    Team
 )
 
 from ambassador.cgc.tierror import TiError
@@ -36,9 +27,7 @@ class FeedbackRetriever(object):
         self._round = round_
 
     def _get_feedback(self, category):
-        """_get_feedback()"""
-        if category not in ['poll', 'pov', 'cb']:
-            raise NotImplementedError("{} not valid".format(category))
+        """Get feedback"""
         data = {}
         try:
             LOG.info("Getting {}".format(category))
