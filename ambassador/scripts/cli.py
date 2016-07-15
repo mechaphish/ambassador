@@ -31,13 +31,13 @@ class CLI(object):
         self.notifier = Notifier()
         self.api_down_tries = 0
 
-    def api_down(self):
+    def api_is_down(self):
         """Another docstring again"""
         self.api_down_tries += 1
         if self.api_down_tries == self.NOTIFY_AFTER_NUMBER_OF_TRIES:
             self.notifier.api_is_down()
 
-    def api_up(self):
+    def api_is_up(self):
         """And another"""
         self.api_down_tries = 0
         self.notifier.api_is_up()
