@@ -65,6 +65,7 @@ class ConsensusEvaluationRetriever(object):
             cbn = ChallengeBinaryNode.get(ChallengeBinaryNode.sha256 == cb_info['hash'])
         except ChallengeBinaryNode.DoesNotExist:
             cbn = self._save_cbn(cb_info)
+        cbn.cs.seen_in_round(self._round)
         try:
             csf = ChallengeSetFielding.get((ChallengeSetFielding.cs == cbn.cs) & \
                                            (ChallengeSetFielding.team == team) & \
