@@ -7,8 +7,7 @@ POVSubmitter module
 
 from __future__ import absolute_import
 
-from farnsworth.config import master_db
-from farnsworth.models import (ExploitFielding, ExploitSubmissionCable, Round)
+from farnsworth.models import (ExploitSubmissionCable, Round)
 
 from ambassador.cgc.tierror import TiError
 import ambassador.log
@@ -25,19 +24,19 @@ class POVSubmitter(object):
         self._cgc = cgc
 
     def run(self):
+        """Amazing docstring"""
         for cable in ExploitSubmissionCable.unprocessed():
             pov = cable.exploit
             try:
-                import ipdb; ipdb.set_trace()
                 result = self._cgc.uploadPOV(str(pov.cs.name),
                                              str(cable.team.name),
                                              str(cable.throws),
                                              str(pov.blob))
                 LOG.debug("Submitted POV! Response: %s", result)
                 submission_round = Round.get(Round.num == result['round'])
-                pov.submit_to(team=cable.team, throws=cable.throws)
+                pov.submit_to(team=cable.team, throws=cable.throws, round=submission_round)
 
-            except TiError as e:
-                LOG.error("POV Submission error: %s", e.message)
+            except TiError as err:
+                LOG.error("POV Submission error: %s", err.message)
 
             cable.process()
