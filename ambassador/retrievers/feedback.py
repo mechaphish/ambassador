@@ -13,7 +13,7 @@ from farnsworth.models import (
 
 from ambassador.cgc.tierror import TiError
 import ambassador.log
-LOG = ambassador.log.LOG.getChild('feedback_retriever')
+LOG = ambassador.log.LOG.getChild('retriever.feedback')
 
 
 class FeedbackRetriever(object):

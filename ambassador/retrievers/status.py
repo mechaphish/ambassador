@@ -13,7 +13,7 @@ from farnsworth.models import (
 )
 
 import ambassador.log
-LOG = ambassador.log.LOG.getChild('status_retriever')
+LOG = ambassador.log.LOG.getChild('retrievers.status')
 
 
 class StatusRetriever(object):
