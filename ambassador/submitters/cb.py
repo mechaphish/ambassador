@@ -48,12 +48,12 @@ class CBSubmitter(object):
                                                (str(original_cbid),
                                                 str(patch.blob)))
                   LOG.debug("Submitted RB! Response: %s", result)
-                  submission_round = Round.get(Round.num == result['round'])
+                  submission_round, _ = Round.get_or_create(num=result['round'])
                   cable.cs.submit_patches(submission_round, patch)
                   # submit ids
                   if patch.ids_rule is not None:
                       result = self._cgc.uploadIDS(str(cable.cs.name), str(patch.ids_rule.rules))
-                      submission_round = Round.get(Round.num == result['round'])
+                      submission_round, _ = Round.get_or_create(num=result['round'])
                       IDSRuleFielding.get_or_create(ids_rule=patch.ids_rule,
                                                     submission_round=submission_round,
                                                     team=Team.get_our())

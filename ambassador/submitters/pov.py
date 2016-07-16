@@ -33,7 +33,7 @@ class POVSubmitter(object):
                                              str(cable.throws),
                                              str(pov.blob))
                 LOG.debug("Submitted POV! Response: %s", result)
-                submission_round = Round.get(Round.num == result['round'])
+                submission_round, _ = Round.get_or_create(num=result['round'])
                 pov.submit_to(team=cable.team, throws=cable.throws, round=submission_round)
 
             except TiError as err:
