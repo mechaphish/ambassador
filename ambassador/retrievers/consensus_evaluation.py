@@ -9,6 +9,8 @@ from __future__ import absolute_import
 
 import os
 
+from peewee import IntegrityError
+
 from farnsworth.models import (
     ChallengeBinaryNode,
     ChallengeSet,
@@ -72,8 +74,11 @@ class ConsensusEvaluationRetriever(object):
                                            (ChallengeSetFielding.available_round == self._round))
             csf.add_cbns_if_missing(cbn)
         except ChallengeSetFielding.DoesNotExist:
-            csf = ChallengeSetFielding.create(cs=cbn.cs, team=team,
-                                              cbns=[cbn], available_round=self._round)
+            try:
+                csf = ChallengeSetFielding.create(cs=cbn.cs, team=team,
+                                                  cbns=[cbn], available_round=self._round)
+            except IntegrityError:
+                pass
 
     def _save_ids_fielding(self, ids_info, team):
         """FIXME"""
