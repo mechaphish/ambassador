@@ -18,6 +18,7 @@ from ambassador.notifier import Notifier
 from ambassador.retrievers.consensus_evaluation import ConsensusEvaluationRetriever
 from ambassador.retrievers.feedback import FeedbackRetriever
 from ambassador.retrievers.status import StatusRetriever
+from ambassador.submitters.pov import POVSubmitter
 
 LOG = ambassador.log.LOG.getChild('main')
 
@@ -49,6 +50,9 @@ class CLI(object):
 
                 ConsensusEvaluationRetriever(self.cgc, status_retriever.current_round).run()
                 FeedbackRetriever(self.cgc, status_retriever.current_round).run()
+
+                # submit!
+                POVSubmitter(self.cgc).run()
 
             except ambassador.cgc.tierror.TiError:
                 self.notifier.api_is_down()
