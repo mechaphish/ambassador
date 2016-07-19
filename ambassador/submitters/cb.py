@@ -45,8 +45,12 @@ class CBSubmitter(object):
         if (self._current_round.num % 2) == 1:
 
             for cs in ChallengeSet.fielded_in_round():
-                for cable in cs.unprocessed_submission_cables():
 
+                if cs.has_submissions_in_round(self._current_round):
+                    LOG.info("Skipping CS %s because has already a submission", cs.name)
+                    continue
+
+                for cable in cs.unprocessed_submission_cables():
                     try:
                         patches_fielding = self._submit_patches(cable)
                         ids_fielding = self._submit_ids_rule(cable)
