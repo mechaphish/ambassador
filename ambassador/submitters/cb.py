@@ -42,16 +42,18 @@ class CBSubmitter(object):
     def run(self):
         """Amazing docstring"""
         # submit only in odd rounds, see FAQ163 & FAQ157
+        # FIXME: Remove the following check for CFE
         if (self._current_round.num % 2) == 1:
-
             for cs in ChallengeSet.fielded_in_round():
-
+                # FIXME: Remove the following check for CFE
                 if cs.has_submissions_in_round(self._current_round):
                     LOG.info("Skipping CS %s because has already a submission", cs.name)
                     continue
 
                 for cable in cs.unprocessed_submission_cables():
                     try:
+                        # FIXME: Possible race condition for patch and ids
+                        # submission round
                         patches_fielding = self._submit_patches(cable)
                         ids_fielding = self._submit_ids_rule(cable)
                         cable.process()
