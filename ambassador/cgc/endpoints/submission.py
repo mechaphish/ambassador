@@ -77,11 +77,11 @@ class TiSubmission(object):
         fields = [("csid", csid), ('team', team), ('throws', throws)]
         uploads = []
 
-        uploads.append(('file', 'filename.pov', data))
+        expected = hashlib.sha256(data).hexdigest()
+
+        uploads.append(('file', '%s.pov' % expected, data))
 
         status, reason, body = self._make_request('/pov', fields, uploads)
-
-        expected = hashlib.sha256(data).hexdigest()
 
         try:
             response = json.loads(body)
