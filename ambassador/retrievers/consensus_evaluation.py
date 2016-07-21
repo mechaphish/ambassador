@@ -9,8 +9,6 @@ from __future__ import absolute_import
 
 import os
 
-from peewee import IntegrityError
-
 from farnsworth.models import (
     ChallengeBinaryNode,
     ChallengeSet,
@@ -48,13 +46,12 @@ class ConsensusEvaluationRetriever(object):
             LOG.warning("Consensus evaluation error: %s", e.message)
         return data
 
-    def _save_cbn(self, cb_info):
+    def _save_cbn(self, cb_info, cs):
         tmp_path = os.path.join("/tmp", "{}-{}".format(cb_info['cbid'], cb_info['hash']))
         binary = self._cgc._get_dl(cb_info['uri'], tmp_path, cb_info['hash'])
         with open(tmp_path, 'rb') as fp:
             blob = fp.read()
         os.remove(tmp_path)
-        cs, _ = ChallengeSet.get_or_create(name=cb_info['csid'])
         cbn = ChallengeBinaryNode.create(name=cb_info['cbid'],
                                          cs=cs,
                                          blob=blob,
@@ -63,22 +60,24 @@ class ConsensusEvaluationRetriever(object):
 
     def _save_cs_fielding(self, cb_info, team):
         """Save CS fielding at current round for team"""
+        cs, _ = ChallengeSet.get_or_create(name=cb_info['csid'])
         try:
-            cbn = ChallengeBinaryNode.get(ChallengeBinaryNode.sha256 == cb_info['hash'])
+            cbn = ChallengeBinaryNode.get((ChallengeBinaryNode.cs == cs) & \
+                                          (ChallengeBinaryNode.name == cb_info['cbid']) & \
+                                          (ChallengeBinaryNode.sha256 == cb_info['hash']))
         except ChallengeBinaryNode.DoesNotExist:
-            cbn = self._save_cbn(cb_info)
-        cbn.cs.seen_in_round(self._round)
+            cbn = self._save_cbn(cb_info, cs)
+
+        cs.seen_in_round(self._round)
+
         try:
-            csf = ChallengeSetFielding.get((ChallengeSetFielding.cs == cbn.cs) & \
+            csf = ChallengeSetFielding.get((ChallengeSetFielding.cs == cs) & \
                                            (ChallengeSetFielding.team == team) & \
                                            (ChallengeSetFielding.available_round == self._round))
             csf.add_cbns_if_missing(cbn)
         except ChallengeSetFielding.DoesNotExist:
-            try:
-                csf = ChallengeSetFielding.create(cs=cbn.cs, team=team,
-                                                  cbns=[cbn], available_round=self._round)
-            except IntegrityError:
-                pass
+            csf = ChallengeSetFielding.create(cs=cs, team=team,
+                                              cbns=[cbn], available_round=self._round)
 
     def _save_ids_fielding(self, ids_info, team):
         """FIXME"""
