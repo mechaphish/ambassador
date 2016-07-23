@@ -7,7 +7,7 @@ POVSubmitter module
 
 from __future__ import absolute_import
 
-from farnsworth.models import (ExploitSubmissionCable, Round)
+from farnsworth.models import (ChallengeSet, Exploit, ExploitSubmissionCable, Round)
 
 from ambassador.cgc.tierror import TiError
 import ambassador.log
@@ -25,7 +25,9 @@ class POVSubmitter(object):
 
     def run(self):
         """Amazing docstring"""
-        for cable in ExploitSubmissionCable.unprocessed():
+        fielded_cses = ChallengeSet.fielded_in_round()
+        unprocessed = ExploitSubmissionCable.unprocessed()
+        for cable in unprocessed.join(Exploit).where(Exploit.cs << fielded_cses):
             pov = cable.exploit
             try:
                 result = self._cgc.uploadPOV(str(pov.cs.name),
