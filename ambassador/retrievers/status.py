@@ -31,17 +31,21 @@ class StatusRetriever(object):
         """Return corrent round"""
         return self._round
 
-    def _save_round(self, status):
-        """Save current round"""
-        self._round, _ = Round.get_or_create(num=status['round'])
-
-    def _save_scores(self, status):
-        """Save scores"""
-        Score.update_or_create(self._round, scores=status['scores'])
-
     def run(self):
-        """A run() method. Happy now pylint?"""
+        """
+        Update game status, including round number and the current scores.
+
+        If we notice that the round number has jumped backward, explicitly create a new round.
+        """
         LOG.info("Getting status")
         status = self._cgc.getStatus()
-        self._save_round(status)
-        self._save_scores(status)
+
+        status_quo_round = Round.current_round()
+        if status_quo_round is not None and status_quo_round.num > status['round']:
+            LOG.info("Round number jumped backwards!")
+            self._round = Round(num=status['round'], ready_at=datetime.now())
+            self._round.save()
+        else:
+            self._round, _ = Round.get_or_create(num=status['round'])
+
+        Score.update_or_create(self._round, scores=status['scores'])
