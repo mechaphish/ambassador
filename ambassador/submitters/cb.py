@@ -43,7 +43,7 @@ class CBSubmitter(object):
         """Amazing docstring"""
         # submit only in odd rounds, see FAQ163 & FAQ157
         # FIXME: Remove the following check for CFE
-        if (self._current_round.num % 2) == 1:
+        if (self._current_round.num % 5) == 1:
             for cs in ChallengeSet.fielded_in_round():
                 # FIXME: Remove the following check for CFE
                 if cs.has_submissions_in_round(self._current_round):
