@@ -50,7 +50,8 @@ class CLI(object):
                 LOG.info("Round #%d", status_retriever.current_round.num)
 
                 ConsensusEvaluationRetriever(self.cgc, status_retriever.current_round).run()
-                status_retriever.current_round.ready()
+                if not status_retriever.current_round.is_ready():
+                    status_retriever.current_round.ready()
 
                 FeedbackRetriever(self.cgc, status_retriever.current_round).run()
 
