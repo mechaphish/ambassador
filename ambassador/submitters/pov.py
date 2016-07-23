@@ -29,6 +29,7 @@ class POVSubmitter(object):
         unprocessed = ExploitSubmissionCable.unprocessed()
         for cable in unprocessed.join(Exploit).where(Exploit.cs << fielded_cses):
             pov = cable.exploit
+            LOG.debug("Submitting POV %d for challenge %s", pov.id, pov.cs.name)
             try:
                 result = self._cgc.uploadPOV(str(pov.cs.name),
                                              str(cable.team.name),
