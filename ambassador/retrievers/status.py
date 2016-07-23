@@ -43,8 +43,7 @@ class StatusRetriever(object):
         status_quo_round = Round.current_round()
         if status_quo_round is not None and status_quo_round.num > status['round']:
             LOG.info("Round number jumped backwards!")
-            self._round = Round(num=status['round'], ready_at=datetime.now())
-            self._round.save()
+            self._round = Round.create(num=status['round'])
         else:
             self._round, _ = Round.get_or_create(num=status['round'])
 
