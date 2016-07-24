@@ -7,6 +7,7 @@ CBSubmitter module
 
 from __future__ import absolute_import
 
+import os
 from farnsworth.models import (ChallengeSet, Round)
 
 from ambassador.cgc.tierror import TiError
@@ -23,6 +24,7 @@ class CBSubmitter(object):
         """A docstring"""
         self._cgc = cgc
         self._current_round = current_round
+        self._submit_rounds_interval = int(os.environ.get('SUBMIT_ROUNDS_INTERVAL', 3))
 
     def _submit_patches(self, cable):
         patches = [(str(cbn.root.name), str(cbn.blob))
@@ -43,7 +45,7 @@ class CBSubmitter(object):
         """Amazing docstring"""
         # submit only in odd rounds, see FAQ163 & FAQ157
         # FIXME: Remove the following check for CFE
-        if (self._current_round.num % 5) == 1:
+        if (self._current_round.num % self._submit_rounds_interval) == 1:
             for cs in ChallengeSet.fielded_in_round():
                 # FIXME: Remove the following check for CFE
                 if cs.has_submissions_in_round(self._current_round):
