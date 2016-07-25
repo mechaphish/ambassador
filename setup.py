@@ -12,7 +12,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'farnsworth',
-        'python-dotenv==0.3.0',
+        'python-dotenv>=0.3.0',
     ],
     extras_require={
         'test': [
