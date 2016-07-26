@@ -14,6 +14,8 @@ from farnsworth.models import (
     ChallengeSet,
     ChallengeSetFielding,
     Evaluation,
+    IDSRule,
+    IDSRuleFielding,
     Team,
 )
 
@@ -58,6 +60,15 @@ class ConsensusEvaluationRetriever(object):
                                          sha256=cb_info['hash'])
         return cbn
 
+    def _save_ids(self, ids_info, cs):
+        tmp_path = os.path.join("/tmp", ids_info['hash'])
+        ids_rule = self._cgc._get_dl(ids_info['uri'], tmp_path, ids_info['hash'])
+        with open(tmp_path, 'rb') as fp:
+            blob = fp.read()
+        os.remove(tmp_path)
+        ids = IDSRule.create(cs=cs, rules=blob, sha256=ids_info['hash'])
+        return ids
+
     def _save_cs_fielding(self, cb_info, team):
         """Save CS fielding at current round for team"""
         cs, _ = ChallengeSet.get_or_create(name=cb_info['csid'])
@@ -80,8 +91,14 @@ class ConsensusEvaluationRetriever(object):
                                               cbns=[cbn], available_round=self._round)
 
     def _save_ids_fielding(self, ids_info, team):
-        """FIXME"""
-        pass
+        """Save IDS fielding at current round for team"""
+        cs, _ = ChallengeSet.get_or_create(name=ids_info['csid'])
+        cs.seen_in_round(self._round)
+        try:
+            ids = IDSRule.get((IDSRule.sha256 == ids_info['hash']) & (IDSRule.cs == cs))
+        except IDSRule.DoesNotExist:
+            ids = self._save_ids(ids_info, cs)
+        isf, _ = IDSRuleFielding.get_or_create(ids_rule=ids, team=team, available_round=self._round)
 
     def run(self):
         """Run! Run! Run!"""
