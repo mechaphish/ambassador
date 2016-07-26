@@ -73,21 +73,14 @@ class ConsensusEvaluationRetriever(object):
         """Save CS fielding at current round for team"""
         cs, _ = ChallengeSet.get_or_create(name=cb_info['csid'])
         cs.seen_in_round(self._round)
-
         try:
             cbn = ChallengeBinaryNode.get((ChallengeBinaryNode.cs == cs) & \
                                           (ChallengeBinaryNode.name == cb_info['cbid']) & \
                                           (ChallengeBinaryNode.sha256 == cb_info['hash']))
         except ChallengeBinaryNode.DoesNotExist:
             cbn = self._save_cbn(cb_info, cs)
-        try:
-            csf = ChallengeSetFielding.get((ChallengeSetFielding.cs == cs) & \
-                                           (ChallengeSetFielding.team == team) & \
-                                           (ChallengeSetFielding.available_round == self._round))
-            csf.add_cbns_if_missing(cbn)
-        except ChallengeSetFielding.DoesNotExist:
-            csf = ChallengeSetFielding.create(cs=cs, team=team,
-                                              cbns=[cbn], available_round=self._round)
+
+        ChallengeSetFielding.create_or_update(team=team, round=self._round, cbn=cbn)
 
     def _save_ids_fielding(self, ids_info, team):
         """Save IDS fielding at current round for team"""
@@ -97,7 +90,8 @@ class ConsensusEvaluationRetriever(object):
             ids = IDSRule.get((IDSRule.sha256 == ids_info['hash']) & (IDSRule.cs == cs))
         except IDSRule.DoesNotExist:
             ids = self._save_ids(ids_info, cs)
-        isf, _ = IDSRuleFielding.get_or_create(ids_rule=ids, team=team, available_round=self._round)
+
+        IDSRuleFielding.get_or_create(ids_rule=ids, team=team, available_round=self._round)
 
     def run(self):
         """Run! Run! Run!"""
