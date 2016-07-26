@@ -75,7 +75,6 @@ class ConsensusEvaluationRetriever(object):
         cs.seen_in_round(self._round)
         try:
             cbn = ChallengeBinaryNode.get((ChallengeBinaryNode.cs == cs) & \
-                                          (ChallengeBinaryNode.name == cb_info['cbid']) & \
                                           (ChallengeBinaryNode.sha256 == cb_info['hash']))
         except ChallengeBinaryNode.DoesNotExist:
             cbn = self._save_cbn(cb_info, cs)
