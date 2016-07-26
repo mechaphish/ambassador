@@ -72,15 +72,14 @@ class ConsensusEvaluationRetriever(object):
     def _save_cs_fielding(self, cb_info, team):
         """Save CS fielding at current round for team"""
         cs, _ = ChallengeSet.get_or_create(name=cb_info['csid'])
+        cs.seen_in_round(self._round)
+
         try:
             cbn = ChallengeBinaryNode.get((ChallengeBinaryNode.cs == cs) & \
                                           (ChallengeBinaryNode.name == cb_info['cbid']) & \
                                           (ChallengeBinaryNode.sha256 == cb_info['hash']))
         except ChallengeBinaryNode.DoesNotExist:
             cbn = self._save_cbn(cb_info, cs)
-
-        cs.seen_in_round(self._round)
-
         try:
             csf = ChallengeSetFielding.get((ChallengeSetFielding.cs == cs) & \
                                            (ChallengeSetFielding.team == team) & \
