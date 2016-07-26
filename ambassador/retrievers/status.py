@@ -37,14 +37,22 @@ class StatusRetriever(object):
 
         If we notice that the round number has jumped backward, explicitly create a new round.
         """
-        LOG.info("Getting status")
+        LOG.debug("Getting status")
         status = self._cgc.getStatus()
 
         status_quo_round = Round.current_round()
-        if status_quo_round is not None and status_quo_round.num > status['round']:
-            LOG.info("Round number jumped backwards!")
+
+        if status_quo_round is None:
+            LOG.info("First game starts")
             self._round = Round.create(num=status['round'])
+        elif status_quo_round.num == status['round']:
+            LOG.debug("Continuing current round")
+            self._round = status_quo_round
         else:
-            self._round, _ = Round.get_or_create(num=status['round'])
+            if status_quo_round.num > status['round']:
+                LOG.info("New game started")
+            else:
+                LOG.info("New round started")
+            self._round = Round.create(num=status['round'])
 
         Score.update_or_create(self._round, scores=status['scores'])
