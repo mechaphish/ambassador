@@ -10,8 +10,8 @@ from __future__ import absolute_import
 from farnsworth.models import (ChallengeSet, Exploit, ExploitSubmissionCable, Round)
 
 from ambassador.cgc.tierror import TiError
-import ambassador.log
-LOG = ambassador.log.LOG.getChild('submitters.pov')
+import ambassador.submitters
+LOG = ambassador.submitters.LOG.getChild('pov')
 
 
 class POVSubmitter(object):

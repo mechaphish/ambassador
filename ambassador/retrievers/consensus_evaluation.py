@@ -20,8 +20,8 @@ from farnsworth.models import (
 )
 
 from ambassador.cgc.tierror import TiError
-import ambassador.log
-LOG = ambassador.log.LOG.getChild('retrievers.consensus_evaluation')
+import ambassador.retrievers
+LOG = ambassador.retrievers.LOG.getChild('consensus_evaluation')
 
 
 class ConsensusEvaluationRetriever(object):

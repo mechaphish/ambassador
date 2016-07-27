@@ -11,8 +11,8 @@ import os
 from farnsworth.models import (ChallengeSet, Round)
 
 from ambassador.cgc.tierror import TiError
-import ambassador.log
-LOG = ambassador.log.LOG.getChild('submitters.cb')
+import ambassador.submitters
+LOG = ambassador.submitters.LOG.getChild('cb')
 
 
 class CBSubmitter(object):

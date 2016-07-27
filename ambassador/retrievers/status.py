@@ -12,8 +12,8 @@ from farnsworth.models import (
     Score,
 )
 
-import ambassador.log
-LOG = ambassador.log.LOG.getChild('retrievers.status')
+import ambassador.retrievers
+LOG = ambassador.retrievers.LOG.getChild('status')
 
 
 class StatusRetriever(object):
