@@ -44,28 +44,22 @@ class FeedbackRetriever(object):
                                   povs=self._get_feedback('pov'),
                                   cbs=self._get_feedback('cb'))
 
-
-        currently_fielded = { c.name: c for c in ChallengeSet.fielded_in_round(self._round) }
+        fielded = {c.name: c for c in ChallengeSet.fielded_in_round(self._round)}
         for c in cgc_polls:
-            cs = currently_fielded[c['csid']]
+            cs = fielded[c['csid']]
 
-            fielding = cs.fieldings.where(
-                ChallengeSetFielding.available_round == self._round,
-                ChallengeSetFielding.team == Team.get_our()
-            ).get()
+            fielding = cs.fieldings.get((ChallengeSetFielding.available_round == self._round)
+                                        & (ChallengeSetFielding.team == Team.get_our()))
 
-            if fielding.poll_feedback is not None:
-                continue
-
-            pf = PollFeedback.create(
-                cs=cs,
-                round_id=self._round.id,
-                success = float(c['functionality']['success'])/100.,
-                timeout = float(c['functionality']['timeout'])/100.,
-                connect = float(c['functionality']['connect'])/100.,
-                function = float(c['functionality']['function'])/100.,
-                time_overhead = float(c['performance']['time'])/100. - 1.,
-                memory_overhead = float(c['performance']['memory'])/100. - 1.,
-            )
-            fielding.poll_feedback = pf
-            fielding.save()
+            if fielding.poll_feedback is None:
+                fnct, perf = c['functionality'], c['performance']
+                pf = PollFeedback.create(cs=cs,
+                                         round=self._round,
+                                         success = float(fnct['success']) / 100.0,
+                                         timeout = float(fnct['timeout']) / 100.0,
+                                         connect = float(fnct['connect']) / 100.0,
+                                         function = float(fnct['function']) / 100.0,
+                                         time_overhead = float(perf['time']) / 100.0 - 1,
+                                         memory_overhead = float(perf['memory']) / 100.0  - 1)
+                fielding.poll_feedback = pf
+                fielding.save()
