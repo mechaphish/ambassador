@@ -92,7 +92,7 @@ class ConsensusEvaluationRetriever(object):
         except IDSRule.DoesNotExist:
             ids = self._save_ids(ids_info, cs)
 
-        IDSRuleFielding.get_or_create(ids_rule=ids, team=team, available_round=self._round)
+        IDSRuleFielding.get_or_create(ids_rule=ids, team=team, available_round=self._round, sha256=ids.sha256)
 
     def run(self):
         """Run! Run! Run!"""
