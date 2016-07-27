@@ -10,7 +10,7 @@ from __future__ import absolute_import
 from datetime import datetime, timedelta
 import os
 
-from farnsworth.models import (ChallengeSet, ChallengeSetFielding,
+from farnsworth.models import (ChallengeSetFielding,
                                CSSubmissionCable, IDSRuleFielding, Round, Team)
 
 from ambassador.cgc.tierror import TiError
@@ -53,7 +53,7 @@ class CBSubmitter(object):
 
     @property
     def _safe_to_submit(self):
-        submission_deadline = self._round.created_at + timedelta(seconds=MAX_ROUND_AGE)
+        submission_deadline = self._current_round.created_at + timedelta(seconds=MAX_ROUND_AGE)
         return datetime.now() < submission_deadline
 
     def run(self):
