@@ -80,7 +80,7 @@ class ConsensusEvaluationRetriever(object):
             cbn = self._save_cbn(cb_info, cs)
 
         ChallengeSetFielding.create_or_update_available(team=team,
-                                                        available_round=self._round,
+                                                        round=self._round,
                                                         cbn=cbn)
 
     def _save_ids_fielding(self, ids_info, team):

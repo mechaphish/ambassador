@@ -39,7 +39,7 @@ class CBSubmitter(object):
         return ChallengeSetFielding.create_or_update_submission(cs=cable.cs,
                                                                 cbns=cable.cbns,
                                                                 team=Team.get_our(),
-                                                                submission_round=submission_round)
+                                                                round=submission_round)
 
     def _submit_ids_rule(self, cable):
         if cable.cbns and (cable.cbns[0].ids_rule is not None):
@@ -54,7 +54,7 @@ class CBSubmitter(object):
     @property
     def _safe_to_submit(self):
         submission_deadline = self._round.created_at + timedelta(seconds=MAX_ROUND_AGE)
-        return datetime.now() > submission_deadline
+        return datetime.now() < submission_deadline
 
     def run(self):
         to_act_on, to_ignore = set(), set()
@@ -69,9 +69,9 @@ class CBSubmitter(object):
         #   (otherwise we should ignore it and process the one).
         for cable in cables:
             if cable.processed_at is None and cable.cs not in to_ignore:
-                to_act_on.append(cable)
+                to_act_on.add(cable)
             else:
-                to_ignore.append(cable.cs)
+                to_ignore.add(cable.cs)
 
         LOG.info("%d cables to act on, ignoring %d cables", len(to_act_on), len(to_ignore))
 
@@ -85,10 +85,11 @@ class CBSubmitter(object):
                 ids_fielding = self._submit_ids_rule(cable)
                 cable.process()
                 if patches_fielding:
-                    LOG.info("Submitted %d RBs for %s in round %d", patches_fielding.cbns.count(),
-                             cs.name, patches_fielding.submission_round.num)
+                    LOG.info("Submitted %d RBs for %s in round %d",
+                             patches_fielding.cbns.count(),
+                             cable.cs.name, patches_fielding.submission_round.num)
                 if ids_fielding:
-                    LOG.info("Submitted IDS for %s in round %d", cs.name,
+                    LOG.info("Submitted IDS for %s in round %d", cable.cs.name,
                              ids_fielding.submission_round.num)
             except TiError as err:
                 LOG.error("RB Submission error: %s", err.message)
