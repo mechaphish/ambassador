@@ -10,7 +10,7 @@ from __future__ import absolute_import
 from datetime import datetime, timedelta
 import os
 
-from farnsworth.models import (ChallengeSet, Round)
+from farnsworth.models import (ChallengeSet, CSSubmissionCable, Round)
 
 from ambassador.cgc.tierror import TiError
 import ambassador.submitters
