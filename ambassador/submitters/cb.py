@@ -36,14 +36,20 @@ class CBSubmitter(object):
         result = self._cgc.uploadRCB(str(cable.cs.name), *patches)
         LOG.debug("Submitted RB! Response: %s", result)
         submission_round, _ = Round.get_or_create(num=result['round'])
-        return cable.cs.submit(cbns=cable.cbns, round=submission_round)
+        return ChallengeSetFielding.create_or_update_submission(cs=cable.cs,
+                                                                cbns=cable.cbns,
+                                                                team=Team.get_our(),
+                                                                submission_round=submission_round)
 
     def _submit_ids_rule(self, cable):
         if cable.cbns and (cable.cbns[0].ids_rule is not None):
             ids_rule = cable.cbns[0].ids_rule
             result = self._cgc.uploadIDS(str(cable.cs.name), str(ids_rule.rules))
             submission_round, _ = Round.get_or_create(num=result['round'])
-            return ids_rule.submit(round=submission_round)
+            irf, _ = IDSRuleFielding.create(ids_rule=ids_rule,
+                                            submission_round=submission_round,
+                                            team=Team.get_our())
+            return irf
 
     @property
     def _safe_to_submit(self):
