@@ -37,8 +37,7 @@ class CBSubmitter(object):
         result = self._cgc.uploadRCB(str(cable.cs.name), *patches)
         LOG.debug("Submitted RB! Response: %s", result)
         submission_round, _ = Round.get_or_create(num=result['round'])
-        return ChallengeSetFielding.create_or_update_submission(cs=cable.cs,
-                                                                cbns=cable.cbns,
+        return ChallengeSetFielding.create_or_update_submission(cbns=cable.cbns,
                                                                 team=Team.get_our(),
                                                                 round=submission_round)
 
