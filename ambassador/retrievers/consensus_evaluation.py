@@ -20,8 +20,8 @@ from farnsworth.models import (
 )
 
 from ambassador.cgc.tierror import TiError
-import ambassador.log
-LOG = ambassador.log.LOG.getChild('retrievers.consensus_evaluation')
+import ambassador.retrievers
+LOG = ambassador.retrievers.LOG.getChild('consensus_evaluation')
 
 
 class ConsensusEvaluationRetriever(object):
@@ -79,7 +79,9 @@ class ConsensusEvaluationRetriever(object):
         except ChallengeBinaryNode.DoesNotExist:
             cbn = self._save_cbn(cb_info, cs)
 
-        ChallengeSetFielding.create_or_update(team=team, round=self._round, cbn=cbn)
+        ChallengeSetFielding.create_or_update_available(team=team,
+                                                        available_round=self._round,
+                                                        cbn=cbn)
 
     def _save_ids_fielding(self, ids_info, team):
         """Save IDS fielding at current round for team"""
