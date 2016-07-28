@@ -39,20 +39,15 @@ class StatusRetriever(object):
         """
         LOG.debug("Getting status")
         status = self._cgc.getStatus()
+        self._round, round_status = Round.get_or_create_latest(num=status['round'])
 
-        status_quo_round = Round.current_round()
-
-        if status_quo_round is None:
+        if round_status == Round.FIRST_GAME:
             LOG.info("First game starts")
-            self._round = Round.create(num=status['round'])
-        elif status_quo_round.num == status['round']:
+        elif round_status == Round.NEW_GAME:
+            LOG.info("New game started")
+        elif round_status == Round.NEW_ROUND:
+            LOG.info("New round started")
+        elif round_status == Round.SAME_ROUND:
             LOG.debug("Continuing current round")
-            self._round = status_quo_round
-        else:
-            if status_quo_round.num > status['round']:
-                LOG.info("New game started")
-            else:
-                LOG.info("New round started")
-            self._round = Round.create(num=status['round'])
 
         Score.update_or_create(self._round, scores=status['scores'])

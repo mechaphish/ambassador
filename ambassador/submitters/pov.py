@@ -36,7 +36,18 @@ class POVSubmitter(object):
                                              str(cable.throws),
                                              str(pov.blob))
                 LOG.debug("Submitted POV! Response: %s", result)
-                submission_round, _ = Round.get_or_create(num=result['round'])
+
+                submission_round, status = Round.get_or_create_latest(num=result['round'])
+
+                if status == Round.FIRST_GAME:
+                    LOG.error("Submission in first round of first game (round #%d)",
+                                submission_round.num)
+                elif status == Round.NEW_GAME:
+                    LOG.info("Submission in first round of new game (round #%d)",
+                                submission_round.num)
+                elif status == Round.NEW_ROUND:
+                    LOG.info("Submission beginning of new round #%d", submission_round.num)
+
                 pov.submit_to(team=cable.team, throws=cable.throws, round=submission_round)
 
             except TiError as err:
