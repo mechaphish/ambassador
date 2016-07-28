@@ -68,9 +68,9 @@ class CBSubmitter(object):
             elif status == Round.NEW_ROUND:
                 LOG.info("Submission beginning of new round #%d", submission_round.num)
 
-            irf, _ = IDSRuleFielding.create(ids_rule=ids_rule,
-                                            submission_round=submission_round,
-                                            team=Team.get_our())
+            irf,_ = IDSRuleFielding.get_or_create(ids_rule=ids_rule,
+                                          submission_round=submission_round,
+                                          team=Team.get_our())
             return irf
 
     @property
