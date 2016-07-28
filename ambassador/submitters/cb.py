@@ -36,7 +36,18 @@ class CBSubmitter(object):
                    for cbn in cable.cbns]
         result = self._cgc.uploadRCB(str(cable.cs.name), *patches)
         LOG.debug("Submitted RB! Response: %s", result)
-        submission_round, _ = Round.get_or_create(num=result['round'])
+
+        submission_round, status = Round.get_or_create_latest(num=result['round'])
+
+        if status == Round.FIRST_GAME:
+            LOG.error("Submission in first round of first game (round #%d)",
+                        submission_round.num)
+        elif status == Round.NEW_GAME:
+            LOG.info("Submission in first round of new game (round #%d)",
+                        submission_round.num)
+        elif status == Round.NEW_ROUND:
+            LOG.info("Submission beginning of new round #%d", submission_round.num)
+
         return ChallengeSetFielding.create_or_update_submission(cbns=cable.cbns,
                                                                 team=Team.get_our(),
                                                                 round=submission_round)
@@ -45,7 +56,18 @@ class CBSubmitter(object):
         if cable.cbns and (cable.cbns[0].ids_rule is not None):
             ids_rule = cable.cbns[0].ids_rule
             result = self._cgc.uploadIDS(str(cable.cs.name), str(ids_rule.rules))
-            submission_round, _ = Round.get_or_create(num=result['round'])
+
+            submission_round, status = Round.get_or_create_latest(num=result['round'])
+
+            if status == Round.FIRST_GAME:
+                LOG.error("Submission in first round of first game (round #%d)",
+                          submission_round.num)
+            elif status == Round.NEW_GAME:
+                LOG.info("Submission in first round of new game (round #%d)",
+                         submission_round.num)
+            elif status == Round.NEW_ROUND:
+                LOG.info("Submission beginning of new round #%d", submission_round.num)
+
             irf, _ = IDSRuleFielding.create(ids_rule=ids_rule,
                                             submission_round=submission_round,
                                             team=Team.get_our())
