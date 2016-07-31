@@ -32,7 +32,7 @@ class CBSubmitter(object):
         self._submit_rounds_interval = int(os.environ.get('SUBMIT_ROUNDS_INTERVAL', 3))
 
     def _submit_patches(self, cable):
-        patches = [(str(cbn.root.name), str(cbn.blob))
+        patches = [(str(cbn.root.name) if cbn.root is not None else str(cbn.name), str(cbn.blob))
                    for cbn in cable.cbns]
         result = self._cgc.uploadRCB(str(cable.cs.name), *patches)
         LOG.debug("Submitted RB! Response: %s", result)
