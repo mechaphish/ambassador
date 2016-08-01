@@ -86,7 +86,6 @@ class ConsensusEvaluationRetriever(object):
     def _save_ids_fielding(self, ids_info, team):
         """Save IDS fielding at current round for team"""
         cs, _ = ChallengeSet.get_or_create(name=ids_info['csid'])
-        cs.seen_in_round(self._round)
         try:
             ids = IDSRule.get((IDSRule.sha256 == ids_info['hash']) & (IDSRule.cs == cs))
         except IDSRule.DoesNotExist:
