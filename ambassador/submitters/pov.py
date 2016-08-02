@@ -26,8 +26,8 @@ class POVSubmitter(object):
     def run(self):
         """Amazing docstring"""
         fielded_cses = ChallengeSet.fielded_in_round()
-        unprocessed = ExploitSubmissionCable.unprocessed()
-        for cable in unprocessed.join(Exploit).where(Exploit.cs << fielded_cses):
+        most_recent = ExploitSubmissionCable.most_recent()
+        for cable in most_recent.join(Exploit).where(Exploit.cs << fielded_cses):
             pov = cable.exploit
             LOG.info("Submitting POV %d for challenge %s", pov.id, pov.cs.name)
             try:
