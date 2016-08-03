@@ -7,7 +7,6 @@ CBSubmitter module
 
 from __future__ import absolute_import
 
-from datetime import datetime, timedelta
 import os
 
 from farnsworth.models import (ChallengeSetFielding,
@@ -16,9 +15,6 @@ from farnsworth.models import (ChallengeSetFielding,
 from ambassador.cgc.tierror import TiError
 import ambassador.submitters
 LOG = ambassador.submitters.LOG.getChild('cb')
-
-MAX_ROUND_AGE = 240
-
 
 class CBSubmitter(object):
     """
@@ -73,11 +69,6 @@ class CBSubmitter(object):
                                           team=Team.get_our())
             return irf
 
-    @property
-    def _safe_to_submit(self):
-        submission_deadline = self._current_round.created_at + timedelta(seconds=MAX_ROUND_AGE)
-        return datetime.now() < submission_deadline
-
     def run(self):
         to_act_on, to_ignore = set(), set()
         cables = self._current_round.cs_submission_cables \
@@ -98,11 +89,12 @@ class CBSubmitter(object):
         LOG.info("%d cables to act on, ignoring %d cables", len(to_act_on), len(to_ignore))
 
         # Process all cables we want to act on
-        while to_act_on and self._safe_to_submit:
+        while to_act_on:
             cable = to_act_on.pop()
             try:
                 # Possible race condition for patch and ids submission
                 # round that is alleviated by our safe_to_submit check
+                # (no longer relevant since we have no real ids rules)
                 patches_fielding = self._submit_patches(cable)
                 ids_fielding = self._submit_ids_rule(cable)
                 cable.process()
